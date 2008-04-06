@@ -31,6 +31,7 @@
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager( typeof( MainForm ) );
             this.groupConnection = new System.Windows.Forms.GroupBox();
+            this.imgLoading = new System.Windows.Forms.PictureBox();
             this.buttonConnect = new System.Windows.Forms.Button();
             this.textPwd = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
@@ -39,18 +40,17 @@
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.textStatus = new System.Windows.Forms.TextBox();
             this.groupMgr = new System.Windows.Forms.GroupBox();
+            this.buttonSynchroHttp = new System.Windows.Forms.Button();
             this.buttonReadSMS = new System.Windows.Forms.Button();
             this.buttonExit = new System.Windows.Forms.Button();
             this.smsDataSet = new ArchiveMe.SmsDataSet();
             this.timerUSB = new System.Windows.Forms.Timer( this.components );
             this.timerSSH = new System.Windows.Forms.Timer( this.components );
-            this.imgLoading = new System.Windows.Forms.PictureBox();
-            this.buttonSynchroHttp = new System.Windows.Forms.Button();
             this.groupConnection.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.imgLoading)).BeginInit();
             this.groupBox2.SuspendLayout();
             this.groupMgr.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.smsDataSet)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.imgLoading)).BeginInit();
             this.SuspendLayout();
             // 
             // groupConnection
@@ -67,6 +67,16 @@
             this.groupConnection.TabIndex = 0;
             this.groupConnection.TabStop = false;
             this.groupConnection.Text = "SSH Connection";
+            // 
+            // imgLoading
+            // 
+            this.imgLoading.Image = ((System.Drawing.Image)(resources.GetObject( "imgLoading.Image" )));
+            this.imgLoading.Location = new System.Drawing.Point( 27, 76 );
+            this.imgLoading.Name = "imgLoading";
+            this.imgLoading.Size = new System.Drawing.Size( 41, 20 );
+            this.imgLoading.TabIndex = 7;
+            this.imgLoading.TabStop = false;
+            this.imgLoading.Visible = false;
             // 
             // buttonConnect
             // 
@@ -145,6 +155,16 @@
             this.groupMgr.TabStop = false;
             this.groupMgr.Text = "SMS manager";
             // 
+            // buttonSynchroHttp
+            // 
+            this.buttonSynchroHttp.Location = new System.Drawing.Point( 6, 49 );
+            this.buttonSynchroHttp.Name = "buttonSynchroHttp";
+            this.buttonSynchroHttp.Size = new System.Drawing.Size( 150, 23 );
+            this.buttonSynchroHttp.TabIndex = 1;
+            this.buttonSynchroHttp.Text = "&Upload to server";
+            this.buttonSynchroHttp.UseVisualStyleBackColor = true;
+            this.buttonSynchroHttp.Click += new System.EventHandler( this.buttonSynchroHttp_Click );
+            // 
             // buttonReadSMS
             // 
             this.buttonReadSMS.Location = new System.Drawing.Point( 6, 20 );
@@ -180,26 +200,6 @@
             this.timerSSH.Interval = 10000;
             this.timerSSH.Tick += new System.EventHandler( this.timerSSH_Tick );
             // 
-            // imgLoading
-            // 
-            this.imgLoading.Image = ((System.Drawing.Image)(resources.GetObject( "imgLoading.Image" )));
-            this.imgLoading.Location = new System.Drawing.Point( 27, 76 );
-            this.imgLoading.Name = "imgLoading";
-            this.imgLoading.Size = new System.Drawing.Size( 41, 20 );
-            this.imgLoading.TabIndex = 7;
-            this.imgLoading.TabStop = false;
-            this.imgLoading.Visible = false;
-            // 
-            // buttonSynchroHttp
-            // 
-            this.buttonSynchroHttp.Location = new System.Drawing.Point( 6, 49 );
-            this.buttonSynchroHttp.Name = "buttonSynchroHttp";
-            this.buttonSynchroHttp.Size = new System.Drawing.Size( 150, 23 );
-            this.buttonSynchroHttp.TabIndex = 1;
-            this.buttonSynchroHttp.Text = "&Upload to server";
-            this.buttonSynchroHttp.UseVisualStyleBackColor = true;
-            this.buttonSynchroHttp.Click += new System.EventHandler( this.buttonSynchroHttp_Click );
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF( 6F, 13F );
@@ -211,16 +211,17 @@
             this.Controls.Add( this.groupConnection );
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "MainForm";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "ArchiveMe iPhone SMS archiver";
             this.Load += new System.EventHandler( this.MainForm_Load );
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler( this.MainForm_FormClosed );
             this.groupConnection.ResumeLayout( false );
             this.groupConnection.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.imgLoading)).EndInit();
             this.groupBox2.ResumeLayout( false );
             this.groupBox2.PerformLayout();
             this.groupMgr.ResumeLayout( false );
             ((System.ComponentModel.ISupportInitialize)(this.smsDataSet)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.imgLoading)).EndInit();
             this.ResumeLayout( false );
 
         }

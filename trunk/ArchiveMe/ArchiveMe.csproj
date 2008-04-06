@@ -40,6 +40,7 @@
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
     <Reference Include="System.Data.SQLite, Version=1.0.48.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=x86" />
+    <Reference Include="System.Security" />
     <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -63,6 +64,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>AddrDataSet.xsd</DependentUpon>
     </Compile>
+    <Compile Include="ArchiveMePolicy.cs" />
     <Compile Include="DBManager.cs" />
     <Compile Include="iPhoneManager.cs" />
     <Compile Include="iSmsDataSet.Designer.cs">

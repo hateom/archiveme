@@ -90,9 +90,37 @@ namespace ArchiveMe
             string hash = System.Convert.ToBase64String(md5.ComputeHash(StrToByteArray(input)));
             return hash;
         }
+
+        static public string MD5( string input )
+        {
+            byte[] textBytes = System.Text.Encoding.Default.GetBytes(input);
+            string ret = "";
+    		try {
+	    		System.Security.Cryptography.MD5CryptoServiceProvider cryptHandler;
+		    	cryptHandler = new System.Security.Cryptography.MD5CryptoServiceProvider();
+			    byte[] hash = cryptHandler.ComputeHash (textBytes);
+			    foreach (byte a in hash) {
+				    if (a<16)
+    					ret += "0" + a.ToString("x");
+	    			else
+		    			ret += a.ToString("x");
+    			}
+	    		return ret ;
+		    }
+		    catch {
+			    return "";
+		    }
+        }
+
         public static bool Synchronize(SmsDataSet sms_ds, AddrDataSet addr_ds, ref synchroResult res )
         {
-            string connString = @"data source=" + getLocalDBName();
+            string connString;
+            if( !File.Exists(getLocalDBName() ) )
+            {
+                return false;
+            }
+            connString = @"data source=" + getLocalDBName();
+
             using(var conn = new SQLiteConnection( connString ))
             {
                 var msg     = new iSmsDataSetTableAdapters.messagesTableAdapter();

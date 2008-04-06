@@ -208,41 +208,15 @@ namespace ArchiveMe
 
         #endregion
 
-        internal bool UploadData(string user, string pass)
+        private bool uploadData( string url, string data, out string resp )
         {
-            StringBuilder str = new StringBuilder("");
-            //string uri = @"http://student.uci.agh.edu.pl/~huczek/isms/test.php";
-            string uri = @"http://127.0.0.1:8080/isms/upload.php";
+            resp = "";
+            byte[] postBytes = Encoding.ASCII.GetBytes( data.ToString() );
             bool result = true;
 
-            foreach( var i in DBManager.dataSet.numbers )
-            {
-                str.Append( "user_id[]=" + HttpUtility.UrlEncode(i.user_id) );
-                str.Append( "&number[]=" + HttpUtility.UrlEncode(i.number) + "&" );
-            }
+            System.Net.ServicePointManager.CertificatePolicy = new ArchiveMePolicy();
 
-            foreach( var i in DBManager.dataSet.users )
-            {
-                str.Append( "id[]=" + HttpUtility.UrlEncode(i.id) );
-                str.Append( "&first[]=" + HttpUtility.UrlEncode(i.first) );
-                str.Append( "&last[]=" + HttpUtility.UrlEncode(i.last) + "&" );
-            }
-
-            foreach( var i in DBManager.dataSet.messages )
-            {
-                str.Append( "md5[]=" + HttpUtility.UrlEncode(i.md5) );
-                str.Append( "&date[]=" + HttpUtility.UrlEncode(i.date.ToString()) );
-                str.Append( "&number[]=" + HttpUtility.UrlEncode(i.number) );
-                str.Append( "&message[]=" + HttpUtility.UrlEncode(i.message) );
-                str.Append( "&sent[]=" + HttpUtility.UrlEncode( i.sent.ToString() ) + "&" );
-            }
-
-            str.Append( "username=" + HttpUtility.UrlEncode(user) );
-            str.Append( "&password=" + DBManager.getHash( HttpUtility.UrlEncode(pass) ) );
-
-            byte[] postBytes = Encoding.ASCII.GetBytes( str.ToString() );
-
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create( uri );
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create( url );
             Stream requestStream = null;
 
             try
@@ -257,7 +231,6 @@ namespace ArchiveMe
             }
             catch(WebException)
             {
-                result = false;
             }
             finally
             {
@@ -268,8 +241,7 @@ namespace ArchiveMe
             {
                 HttpWebResponse response = (HttpWebResponse)request.GetResponse();
                 string response_data = new StreamReader( response.GetResponseStream() ).ReadToEnd();
-                //var rh = response.Headers.ToString();
-
+                resp = response_data;
             }
             catch(WebException)
             {
@@ -277,6 +249,74 @@ namespace ArchiveMe
             }
 
             return result;
+        }
+
+        public delegate void onProgressDelegate( string table, int recnum );
+
+        internal bool UploadData( string user, string pass, out string resp, onProgressDelegate op )
+        {
+            
+            //string uri = @"http://student.uci.agh.edu.pl/~huczek/isms/test.php";
+            string uri = @"http://127.0.0.1:8080/isms/upload.php";
+            //string uri = @"https://upload.archiveme.net/upload.php";
+            bool result = true;
+            string rpmsg;
+            resp = "";
+            int recnum = 0;
+
+            StringBuilder istr = new StringBuilder( "" );
+            istr.Append( "&username=" + HttpUtility.UrlEncode( user ) );
+            istr.Append( "&password=" + HttpUtility.UrlEncode( pass ) );
+            result = uploadData( uri, istr.ToString(), out rpmsg );
+            if(!result || !rpmsg.StartsWith( "ok" ))
+            {
+                resp = "Could not log in!";
+                return false;
+            }
+
+            foreach(var i in DBManager.dataSet.numbers)
+            {
+                StringBuilder str = new StringBuilder( "" );
+                str.Append( "user_id[]=" + HttpUtility.UrlEncode( i.user_id ) );
+                str.Append( "&number[]=" + HttpUtility.UrlEncode( i.number ) );
+                str.Append( "&username=" + HttpUtility.UrlEncode( user ) );
+                str.Append( "&password=" + HttpUtility.UrlEncode( pass ) );
+                op.BeginInvoke( "Phone numbers", recnum++, null, null );
+                result = uploadData( uri, str.ToString(), out rpmsg );
+                if(!result || !rpmsg.StartsWith( "ok" )) return false;
+            }
+
+            recnum = 0;
+            foreach(var i in DBManager.dataSet.users)
+            {
+                StringBuilder str = new StringBuilder( "" );
+                str.Append( "id[]=" + HttpUtility.UrlEncode( i.id ) );
+                str.Append( "&first[]=" + HttpUtility.UrlEncode( i.first ) );
+                str.Append( "&last[]=" + HttpUtility.UrlEncode( i.last ) );
+                str.Append( "&username=" + HttpUtility.UrlEncode( user ) );
+                str.Append( "&password=" + HttpUtility.UrlEncode( pass ) );
+                op.BeginInvoke( "Address book entries", recnum++, null, null );
+                result = uploadData( uri, str.ToString(), out rpmsg );
+                if(!result || !rpmsg.StartsWith( "ok" )) return false;
+            }
+
+            recnum = 0;
+            foreach(var i in DBManager.dataSet.messages)
+            {
+                StringBuilder str = new StringBuilder( "" );
+                str.Append( "md5[]=" + HttpUtility.UrlEncode( i.md5 ) );
+                str.Append( "&date[]=" + HttpUtility.UrlEncode( i.date.ToString() ) );
+                str.Append( "&number[]=" + HttpUtility.UrlEncode( i.number ) );
+                str.Append( "&message[]=" + HttpUtility.UrlEncode( i.message ) );
+                str.Append( "&sent[]=" + HttpUtility.UrlEncode( i.sent.ToString() ) );
+                str.Append( "&username=" + HttpUtility.UrlEncode( user ) );
+                str.Append( "&password=" + HttpUtility.UrlEncode( pass ) );
+                op.BeginInvoke( "Messages", recnum++, null, null );
+                result = uploadData( uri, str.ToString(), out rpmsg );
+                if(!result || !rpmsg.StartsWith( "ok" )) return false;
+            }
+
+            return true;
         }
     }
 }
