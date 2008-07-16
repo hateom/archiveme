@@ -1,10 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 
 namespace ArchiveMe
@@ -31,15 +25,15 @@ namespace ArchiveMe
 
         public delegate void onUploadDelegate();
 
-        public void onProgress( string table, int recnum )
+        public void onProgress( string table, int recnum, int max )
         {
             if(InvokeRequired)
             {
-                BeginInvoke( new iPhoneManager.onProgressDelegate(onProgress), new object[]{table,recnum} );
+                BeginInvoke( new iPhoneManager.onProgressDelegate(onProgress), new object[]{table,recnum,max} );
                 return;
             }
 
-            labelStatus.Text = "Uploading " + table + "("+recnum.ToString()+")";
+            labelStatus.Text = string.Format("Uploading {0} ({1}/{2})", table, recnum, max);
         }
 
         private bool upload_result = false;
@@ -52,7 +46,7 @@ namespace ArchiveMe
                 string user = textUser.Text;
                 string pass = DBManager.MD5( textPass.Text );
 
-                upload_result = iphone.UploadData( user, pass, out upload_response, new iPhoneManager.onProgressDelegate( onProgress ) );
+                upload_result = iphone.UploadData( user, pass, out upload_response, onProgress );
 
                 BeginInvoke( new onUploadDelegate( OnUpload ) );
                 return;
@@ -83,7 +77,7 @@ namespace ArchiveMe
             buttonUpload.SetBounds( buttonUpload.Location.X, buttonUpload.Location.Y, 128, buttonUpload.Size.Height );
             
             upload_result = false;
-            onUploadDelegate onUpload = new onUploadDelegate( OnUpload );
+            onUploadDelegate onUpload = OnUpload;
             onUpload.BeginInvoke( null, null );
         }
 

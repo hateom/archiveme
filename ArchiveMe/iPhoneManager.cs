@@ -198,8 +198,8 @@ namespace ArchiveMe
         private bool isConnected = false;
         public bool IsConnected { get { return isConnected; } }
         public delegate void OnConnected(ConnType ct, bool result);
-        public const string smsFileName  = @"/var/root/Library/SMS/sms.db";
-        public const string addrFileName = @"/var/root/Library/AddressBook/AddressBook.sqlitedb";
+        public const string smsFileName  = @"/User/Library/SMS/sms.db";
+        public const string addrFileName = @"/User/Library/AddressBook/AddressBook.sqlitedb";
         public const string smsDst       = @"sms.db";
         public const string addrDst      = @"addr.db";
 
@@ -251,7 +251,7 @@ namespace ArchiveMe
             return result;
         }
 
-        public delegate void onProgressDelegate( string table, int recnum );
+        public delegate void onProgressDelegate( string table, int recnum, int max );
 
         internal bool UploadData( string user, string pass, out string resp, onProgressDelegate op )
         {
@@ -281,7 +281,7 @@ namespace ArchiveMe
                 str.Append( "&number[]=" + HttpUtility.UrlEncode( i.number ) );
                 str.Append( "&username=" + HttpUtility.UrlEncode( user ) );
                 str.Append( "&password=" + HttpUtility.UrlEncode( pass ) );
-                op.BeginInvoke( "Phone numbers", recnum++, null, null );
+                op.BeginInvoke( "Phone numbers", recnum++, DBManager.dataSet.numbers.Count, null, null );
                 result = uploadData( uri, str.ToString(), out rpmsg );
                 if(!result || !rpmsg.StartsWith( "ok" )) return false;
             }
@@ -295,7 +295,7 @@ namespace ArchiveMe
                 str.Append( "&last[]=" + HttpUtility.UrlEncode( i.last ) );
                 str.Append( "&username=" + HttpUtility.UrlEncode( user ) );
                 str.Append( "&password=" + HttpUtility.UrlEncode( pass ) );
-                op.BeginInvoke( "Address book entries", recnum++, null, null );
+                op.BeginInvoke( "Address book entries", recnum++, DBManager.dataSet.users.Count, null, null );
                 result = uploadData( uri, str.ToString(), out rpmsg );
                 if(!result || !rpmsg.StartsWith( "ok" )) return false;
             }
@@ -311,7 +311,7 @@ namespace ArchiveMe
                 str.Append( "&sent[]=" + HttpUtility.UrlEncode( i.sent.ToString() ) );
                 str.Append( "&username=" + HttpUtility.UrlEncode( user ) );
                 str.Append( "&password=" + HttpUtility.UrlEncode( pass ) );
-                op.BeginInvoke( "Messages", recnum++, null, null );
+                op.BeginInvoke( "Messages", recnum++, DBManager.dataSet.messages.Count, null, null );
                 result = uploadData( uri, str.ToString(), out rpmsg );
                 if(!result || !rpmsg.StartsWith( "ok" )) return false;
             }
